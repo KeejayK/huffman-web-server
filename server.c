@@ -75,9 +75,7 @@ void respond(int client_fd) {
     int bytes = read(client_fd, buffer, BUFFER_SIZE - 1);  // Put client request into buffer
 
     printf("------------------------------ Request ------------------------------ \n");
-
     printf("Request: %s\n", buffer);
-
     printf("--------------------------------------------------------------------- \n");
 
     // Was read successful?
@@ -140,7 +138,6 @@ void serve(int client_socket, const char* filename, char* buffer) {
 }
 
 void upload(int client_socket, const char* filename, char* buffer) {
-    // Path format is "content/<filename>.txt"
     if (!filename) {
         // Filename not found, maybe wonky formatting?
         const char *message = "HTTP/1.1 400 BAD REQUEST\r\nContent-length: 0\r\n\r\n";
