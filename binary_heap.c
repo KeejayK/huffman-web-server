@@ -2,18 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct Node {
-    unsigned char character;
-    unsigned int count;
-    struct Node* left;
-    struct Node* right ;
-} Node;
-
-typedef struct {
-    Node* array[256];  // One node for each ASCII character
-    int size;
-} MinHeap;
+#include "types.h"
 
 
 void swap(Node** x, Node** y) {
@@ -107,7 +96,7 @@ Node* removeMin(MinHeap* heap) {
     return min;
 }
 
-void test() {
+void testHeap() {
     unsigned char characters[] = {'a', 'b', 'c', '1', '2', '3'};
     unsigned int counts[] = {3, 6, 9, 1, 2, 4};
     int size = sizeof(characters) / sizeof(characters[0]);
@@ -143,7 +132,6 @@ void test() {
     free(heap);
 }
 
-
-int main() {
-    test();
-}
+// int main() {
+//     testHeap();
+// }
