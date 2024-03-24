@@ -12,6 +12,9 @@
 #include <netinet/in.h>
 #include <fcntl.h> 
 #include <limits.h>
+#include "binary_heap.h"
+#include "huffman_tree.h"
+#include "huffman_code.h"
 
 #define PORT 8080
 #define BUFFER_SIZE 2048
@@ -113,9 +116,10 @@ void respond(int client_fd) {
 }
 
 void serve(int client_socket, const char* filename, char* buffer) {
-    int file_descriptor = open(filename, O_RDONLY);
+    char* decoded = NULL;
+    int result = readEncoded(filename, &decoded);
     
-    if (file_descriptor < 0) {
+    if (result < 0) {
         // File not found
         const char *message = "HTTP/1.1 404 NOT FOUND\r\nContent-length: 0\r\n\r\n";
         send(client_socket, message, strlen(message), 0);
@@ -124,17 +128,31 @@ void serve(int client_socket, const char* filename, char* buffer) {
         // File found
         const char *message = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
         send(client_socket, message, strlen(message), 0);
-
-        // As long there is more to read, keep reading file
-        // Must send in chunks since there is limited buffer size
-        memset(buffer, 0, BUFFER_SIZE);  // Clear buffer
-        int bytes_read; 
-        while ((bytes_read = read(file_descriptor, buffer, BUFFER_SIZE)) > 0) {
-            send(client_socket, buffer, bytes_read, 0);
-            memset(buffer, 0, BUFFER_SIZE);  // Clear buffer
-        }
-        close(file_descriptor);
+        send(client_socket, decoded, strlen(decoded), 0);
     }
+
+    // int file_descriptor = open(filename, O_RDONLY);
+    
+    // if (file_descriptor < 0) {
+    //     // File not found
+    //     const char *message = "HTTP/1.1 404 NOT FOUND\r\nContent-length: 0\r\n\r\n";
+    //     send(client_socket, message, strlen(message), 0);
+
+    // } else {
+    //     // File found
+    //     const char *message = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+    //     send(client_socket, message, strlen(message), 0);
+
+    //     // As long there is more to read, keep reading file
+    //     // Must send in chunks since there is limited buffer size
+    //     memset(buffer, 0, BUFFER_SIZE);  // Clear buffer
+    //     int bytes_read; 
+    //     while ((bytes_read = read(file_descriptor, buffer, BUFFER_SIZE)) > 0) {
+    //         send(client_socket, buffer, bytes_read, 0);
+    //         memset(buffer, 0, BUFFER_SIZE);  // Clear buffer
+    //     }
+    //     close(file_descriptor);
+    // }
 }
 
 void upload(int client_socket, const char* filename, char* buffer) {

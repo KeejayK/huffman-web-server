@@ -1,8 +1,6 @@
 # simple_web_server
 
-A single thread web server written in C that stores and serves text files.
-Clients can upload files to the server through an HTTP POST request where the text file data is compressed through huffman encoding.
-The file can later be decoded and retrieved using an HTTP GET request. Clients differentiate different text files by filename. 
+A single thread web server written in C that stores and serves text files. Clients can upload files to the server through an HTTP POST request where the text file data is compressed through huffman encoding. The file can later be decoded and retrieved using an HTTP GET request. Clients differentiate different text files by filename. 
 
 # Features
 - Compression/Encoding
@@ -22,6 +20,39 @@ The file can later be decoded and retrieved using an HTTP GET request. Clients d
     - 200 OK
 
 # Usage
+Testing
+```
+$ gcc test.c binary_heap.c huffman_code.c huffman_tree.c -o test
+$ valgrind --leak-check=yes ./test
+```
+
+Running the server
+```
+$ gcc binary_heap.c huffman_code.c huffman_tree.c server.c -o server
+$ ./server
+Server started on port 8080
+```
+
+GET request from server
+```
+$ curl -G -v http://localhost:8080/fox.txt
+*   Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /fox.txt HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.88.1
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< Content-Type: text/plain
+* no chunk, no close, no size. Assume close to signal end
+< 
+fox.txt: the quick brown fox jumps over the lazy dog
+* Closing connection 0
+```
+
+- POST request from server
+    - 
 
 # Dependencies
 

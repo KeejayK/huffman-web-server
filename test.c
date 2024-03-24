@@ -56,7 +56,7 @@ int main() {
         "aabbbcccc",
         "aaaaaaa",
         "",
-        "the quick brown fox jumps over the lazy dog",
+        "the quick brown fox jumps over the lazy dog\n",
         "AABBCCaabbcc",
         "-20 * 20 = 400?",
         NULL 
@@ -67,34 +67,28 @@ int main() {
         printf("\n");
     }
 
+        char* decoded = NULL;
+        writeEncoded("fox.txt", testStrings[4]);
+        int result = readEncoded("fox.txt", &decoded);
+        if (result == 0) {
+            printf("decoded result: %s\n", decoded);
+            free(decoded);
+        } 
+
     // for (int i = 0; testStrings[i] != NULL; i++) {
     //     char* decoded = NULL;
     //     writeEncoded("fox.txt", testStrings[i]);
     //     int result = readEncoded("fox.txt", &decoded);
     //     if (result == 0) {
-    //         printf("%s\n", decoded);
+    //         printf("decoded result: %s\n", decoded);
     //         free(decoded);
     //     } 
     // }
 
-    char* decoded = NULL;
-    writeEncoded("fox.txt", testStrings[1]);
-    int result = readEncoded("fox.txt", &decoded);
-    if (result == 0) {
-        printf("%s\n", decoded);
-        free(decoded);
-    } 
 
-    decoded = NULL;
-    writeEncoded("fox.txt", testStrings[2]);
-    result = readEncoded("fox.txt", &decoded);
-    if (result == 0) {
-        printf("%s\n", decoded);
-        free(decoded);
-    } 
-
-    
     // HAHAHAHAHAHAHAHAHAAAAAAAAAAAAA IT WORKSSSSSSSSSSSSSSSSSSSSSS
+    // Nevermind
+    // TODO: "aaaaaa", ""
 
     return EXIT_SUCCESS;
 }

@@ -79,22 +79,22 @@ int serializeTree(Node* node, char* buffer, int index){
 // Reconstructs huffman tree from serialized form
 // Accepts: buffer storing serialized huffman tree, index
 Node* reconstructTree(const char* buffer, int* index) {
-    printf("Reconstructing tree at index: %d, Buffer: %s\n", *index, buffer + *index);
+    // printf("Reconstructing tree at index: %d, Buffer: %s\n", *index, buffer + *index);
     if (buffer[*index] == '\0' || buffer[*index] == '0' && buffer[*index + 1] == '\0') {
         // End of buffer or a '0' followed by end of buffer signifies the end of tree construction
         return NULL;
     }
     if (buffer[*index] == '1') { // If leaf node
-        printf("Found leaf node. Character: %c, Next index: %d\n", buffer[*index + 1], *index + 2);
+        // printf("Found leaf node. Character: %c, Next index: %d\n", buffer[*index + 1], *index + 2);
         (*index)++; // Move past '1'
         Node* leafNode = createNode(buffer[*index], 0); // Add character as new leaf node
         (*index)++; // Move past character
         return leafNode;
     } else if (buffer[*index] == '0'){ // If internal node
-        if (buffer[*index + 1] == '0') {
-            return NULL;
-        }
-        printf("Creating internal node. Current index: %d\n", *index);
+        // if (buffer[*index + 1] == '0' || buffer[*index + 2] == '\0' ) {
+        //     return NULL;
+        // }
+        // printf("Creating internal node. Current index: %d\n", *index);
         (*index)++; // Move past '0'
         Node* node = createNode('\0', 0); // No character for internal node
         node->left = reconstructTree(buffer, index);

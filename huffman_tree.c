@@ -35,7 +35,7 @@ Node* huffmanTree(unsigned char text[], unsigned int count[], int size) {
         new -> left = left_child;
         new -> right = right_child;
         insert(heap, new);
-        printf("Added count: %d\n", new->count); 
+        // printf("Added count: %d\n", new->count); 
     } else {
         while (heap -> size > 1) {
             left_child = removeMin(heap);
@@ -49,7 +49,7 @@ Node* huffmanTree(unsigned char text[], unsigned int count[], int size) {
             new -> right = right_child;
 
             insert(heap, new);
-            printf("Added count: %d\n", new->count); 
+            // printf("Added count: %d\n", new->count); 
         }
     }
 
