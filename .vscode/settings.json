@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "huffman_tree.h": "c",
+        "types.h": "c",
+        "stdio.h": "c",
+        "binary_heap.h": "c",
+        "stdbool.h": "c",
+        "huffman_code.h": "c"
     }
 }

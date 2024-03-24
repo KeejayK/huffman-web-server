@@ -2,7 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types.h"
+
+typedef struct Node {
+    unsigned char character;
+    unsigned int count;
+    struct Node* left;
+    struct Node* right ;
+} Node;
+
+typedef struct {
+    Node* array[256];  // One node for each ASCII character
+    int size;
+} MinHeap;
 
 
 void swap(Node** x, Node** y) {
@@ -68,6 +79,7 @@ void insert(MinHeap *heap, Node *node) {
 
 MinHeap* buildHeap(unsigned char text[], unsigned int count[], int size) {
     MinHeap* heap = (MinHeap*)malloc(sizeof(MinHeap)); // C shenanigans again
+
     // Add all nodes
     for (int i = 0; i < size; i++) {
         heap -> array[i] = createNode(text[i], count[i]);
@@ -135,3 +147,4 @@ void testHeap() {
 // int main() {
 //     testHeap();
 // }
+
