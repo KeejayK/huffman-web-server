@@ -25,8 +25,8 @@ void huffmanEncode(const unsigned char *text, char *encodedText, char codes[256]
 }
 
 // Encodes given text input. 
-// Accepts: text input, text output
-void encodeText(const char* input, char* output) {
+// Accepts: text input, text output (output parameter)
+void encodeText(const char* input, char* output, Node** tree) {
     unsigned char uniqueChars[256];
     unsigned int counts[256];
     char codes[256][256]; 
@@ -48,8 +48,7 @@ void encodeText(const char* input, char* output) {
     // Encode the input string
     huffmanEncode((const unsigned char *)input, output, codes);
 
-    // Cleanup
-    freeTree(root);
+    *tree = root;
 }
 
 // Serializes huffman tree so that it can be thrown in with encoded text
@@ -64,11 +63,14 @@ int serializeTree(Node* node, char* buffer, int index){
     } else {
         // Internal node! Write 0
         buffer[index++] = '0';
+        // Keep going 
+        if (node -> left) {
+            index = serializeTree(node->left, buffer, index);
+        }
+        if (node -> right) {
+            index = serializeTree(node->right, buffer, index);
+        }
     }
-
-    // Keep going until base case
-    index = serializeTree(node->left, buffer, index);
-    index = serializeTree(node->right, buffer, index);
 
     return index;
 }
@@ -77,18 +79,29 @@ int serializeTree(Node* node, char* buffer, int index){
 // Reconstructs huffman tree from serialized form
 // Accepts: buffer storing serialized huffman tree, index
 Node* reconstructTree(const char* buffer, int* index) {
+    printf("Reconstructing tree at index: %d, Buffer: %s\n", *index, buffer + *index);
+    if (buffer[*index] == '\0' || buffer[*index] == '0' && buffer[*index + 1] == '\0') {
+        // End of buffer or a '0' followed by end of buffer signifies the end of tree construction
+        return NULL;
+    }
     if (buffer[*index] == '1') { // If leaf node
+        printf("Found leaf node. Character: %c, Next index: %d\n", buffer[*index + 1], *index + 2);
         (*index)++; // Move past '1'
         Node* leafNode = createNode(buffer[*index], 0); // Add character as new leaf node
         (*index)++; // Move past character
         return leafNode;
-    } else { // If internal node
+    } else if (buffer[*index] == '0'){ // If internal node
+        if (buffer[*index + 1] == '0') {
+            return NULL;
+        }
+        printf("Creating internal node. Current index: %d\n", *index);
         (*index)++; // Move past '0'
         Node* node = createNode('\0', 0); // No character for internal node
         node->left = reconstructTree(buffer, index);
         node->right = reconstructTree(buffer, index); 
         return node;
     }
+    return NULL;
 }
 
 
@@ -97,6 +110,8 @@ Node* reconstructTree(const char* buffer, int* index) {
 // Accepts: encoded string, root node of huffman tree
 // Returns: decoded text!!!!!
 char* decodeText(const char* encodedText, Node* root) {
+    printf("Encoded text: %s\n", (encodedText));
+
     // Wonky stuff in case we want to decode ""
     // cant simply return "" as that would be a string literal ):
     if (!root || !encodedText) {
@@ -105,6 +120,7 @@ char* decodeText(const char* encodedText, Node* root) {
         return empty;
     }
 
+    printf("Encoded text length: %zu\n", strlen(encodedText));
     int length = strlen(encodedText);
     char* decodedText = (char*)malloc(length + 1); // Need space for decoded stuff
 
@@ -130,4 +146,98 @@ char* decodeText(const char* encodedText, Node* root) {
     decodedText[decodedIndex] = '\0'; // Add null terminator 
 
     return decodedText;
+}
+
+// Huffman encodes text and writes the result into a file with provided file name
+// Accepts: filename, text to convert
+void writeEncoded(const char* filename, const char* text) {
+    
+    Node* tree = NULL;
+    char encodedText[1024]; // Maybe change this to be more dynamically allocated later
+    encodeText(text, encodedText, &tree); 
+
+    char treeBuffer[1024]; // For serialized tree
+    int treeSize = serializeTree(tree, treeBuffer, 0); // Serialize the Huffman tree
+
+    // Open file
+    FILE* file = fopen(filename, "wb");
+    if (!file) {
+        perror("Failed to open file");
+        return;
+    }
+
+    // Write serialized tree
+    fwrite(treeBuffer, 1, treeSize, file);
+
+    // Write encoded text
+    fwrite(encodedText, 1, strlen(encodedText), file);
+
+    // Close file
+    fclose(file);
+
+    // Clean up
+    freeTree(tree);
+}
+
+// Reads huffman encoded text located at filename, decodes the text, and returns string result
+// Accepts: filename of desired text, output "<filename>: <decoded text>"
+// Returns: 0 if successful, -1 if file cannot be found
+int readEncoded(const char* filename, char** output) {
+    // Open file
+    FILE* file = fopen(filename, "rb");
+    if (!file) {
+        perror("Failed to open file");
+        return -1;
+    }
+
+    // Find file size
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // Allocate memory for file
+    char* fileContents = (char*)malloc(fileSize + 1);
+    fileContents[fileSize] = '\0';
+    if (!fileContents) {
+        perror("Error allocating memory for fileContents");  // im going insane....
+        fclose(file);
+        free(fileContents);
+        return -1;
+    }
+
+    // Read file
+    fread(fileContents, 1, fileSize, file);
+    fclose(file); 
+
+    
+    // Reconstruct tree
+    int index = 0; // Track position in tree
+    Node* root = reconstructTree(fileContents, &index);
+
+    printf("read: %s \n", fileContents); // Yay!
+    printf("index: %d \n", index);
+
+
+    // We have tree, now decode the rest 
+    char* decodedText = decodeText(fileContents + index, root); 
+
+    // Need 3 more bytes for ":" and " " and "\0"
+    int outputLength = strlen(filename) + strlen(decodedText) + 3; 
+    *output = (char*)malloc(outputLength);
+    if (!output) {
+        perror("Error allocating memory for output");  // so much debugging.........
+        free(fileContents);
+        freeTree(root);
+        free(decodedText);
+        return -1;
+    }
+
+    sprintf(*output, "%s: %s", filename, decodedText);
+
+    // Cleanup
+    free(fileContents);
+    freeTree(root);
+    free(decodedText);
+
+    return EXIT_SUCCESS;
 }

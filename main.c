@@ -54,7 +54,7 @@ int main() {
     const char* testStrings[] = {
         "abc",
         "aabbbcccc",
-        "aaaaaa",
+        "aaaaaaa",
         "",
         "the quick brown fox jumps over the lazy dog",
         "AABBCCaabbcc",
@@ -66,6 +66,35 @@ int main() {
         testHuffmanCoding(testStrings[i]);
         printf("\n");
     }
+
+    // for (int i = 0; testStrings[i] != NULL; i++) {
+    //     char* decoded = NULL;
+    //     writeEncoded("fox.txt", testStrings[i]);
+    //     int result = readEncoded("fox.txt", &decoded);
+    //     if (result == 0) {
+    //         printf("%s\n", decoded);
+    //         free(decoded);
+    //     } 
+    // }
+
+    char* decoded = NULL;
+    writeEncoded("fox.txt", testStrings[1]);
+    int result = readEncoded("fox.txt", &decoded);
+    if (result == 0) {
+        printf("%s\n", decoded);
+        free(decoded);
+    } 
+
+    decoded = NULL;
+    writeEncoded("fox.txt", testStrings[2]);
+    result = readEncoded("fox.txt", &decoded);
+    if (result == 0) {
+        printf("%s\n", decoded);
+        free(decoded);
+    } 
+
+    
+    // HAHAHAHAHAHAHAHAHAAAAAAAAAAAAA IT WORKSSSSSSSSSSSSSSSSSSSSSS
 
     return EXIT_SUCCESS;
 }
