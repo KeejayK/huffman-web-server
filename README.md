@@ -1,4 +1,4 @@
-# simple_web_server
+# huffman_web_server
 
 A single thread web server written in C that stores and serves text files. Clients can upload files to the server through an HTTP POST request where the text file data is compressed through huffman encoding. The file can later be decoded and retrieved using an HTTP GET request. Clients differentiate different text files by filename. 
 
