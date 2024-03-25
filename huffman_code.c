@@ -140,7 +140,7 @@ char* decodeText(const char* encodedText, Node* root) {
             current = root; // Go back to root for next character 
         }
     }
-    decodedText[decodedIndex] = '\n'; // Add null terminator 
+    decodedText[decodedIndex] = '\n'; // Add new line 
     decodedText[decodedIndex+1] = '\0'; // Add null terminator 
 
     return decodedText;
