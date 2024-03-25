@@ -14,7 +14,7 @@ void encodeText(const char* input, char* output);
 
 char* decodeText(const char* encodedText, Node* root);
 
-void writeEncoded(const char* filename, const char* text);
+int writeEncoded(const char* filename, const char* text);
 int readEncoded(const char* filename, char** output);
 
 

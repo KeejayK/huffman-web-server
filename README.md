@@ -20,20 +20,39 @@ A single thread web server written in C that stores and serves text files. Clien
     - 200 OK
 
 # Usage
-Testing
+**Testing**
 ```
 $ gcc test.c binary_heap.c huffman_code.c huffman_tree.c -o test
 $ valgrind --leak-check=yes ./test
 ```
 
-Running the server
+**Running the server**
 ```
 $ gcc binary_heap.c huffman_code.c huffman_tree.c server.c -o server
 $ ./server
 Server started on port 8080
 ```
 
-GET request from server
+**POST request from server**
+```
+$ curl -v -d "the quick brown fox jumps over the lazy dog" http://localhost:8080/fox.txt
+*   Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> POST /fox.txt HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.88.1
+> Accept: */*
+> Content-Length: 43
+> Content-Type: application/x-www-form-urlencoded
+> 
+< HTTP/1.1 200 OK
+< Content-length: 0
+< 
+* Connection #0 to host localhost left intact
+```
+
+
+**GET request from server**
 ```
 $ curl -G -v http://localhost:8080/fox.txt
 *   Trying 127.0.0.1:8080...
@@ -50,12 +69,5 @@ $ curl -G -v http://localhost:8080/fox.txt
 fox.txt: the quick brown fox jumps over the lazy dog
 * Closing connection 0
 ```
-
-- POST request from server
-    - 
-
-# Dependencies
-
-# Installation
 
 

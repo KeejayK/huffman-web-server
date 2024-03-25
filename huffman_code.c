@@ -79,13 +79,11 @@ int serializeTree(Node* node, char* buffer, int index){
 // Reconstructs huffman tree from serialized form
 // Accepts: buffer storing serialized huffman tree, index
 Node* reconstructTree(const char* buffer, int* index) {
-    // printf("Reconstructing tree at index: %d, Buffer: %s\n", *index, buffer + *index);
     if (buffer[*index] == '\0' || buffer[*index] == '0' && buffer[*index + 1] == '\0') {
         // End of buffer or a '0' followed by end of buffer signifies the end of tree construction
         return NULL;
     }
     if (buffer[*index] == '1') { // If leaf node
-        // printf("Found leaf node. Character: %c, Next index: %d\n", buffer[*index + 1], *index + 2);
         (*index)++; // Move past '1'
         Node* leafNode = createNode(buffer[*index], 0); // Add character as new leaf node
         (*index)++; // Move past character
@@ -94,7 +92,6 @@ Node* reconstructTree(const char* buffer, int* index) {
         // if (buffer[*index + 1] == '0' || buffer[*index + 2] == '\0' ) {
         //     return NULL;
         // }
-        // printf("Creating internal node. Current index: %d\n", *index);
         (*index)++; // Move past '0'
         Node* node = createNode('\0', 0); // No character for internal node
         node->left = reconstructTree(buffer, index);
@@ -143,14 +140,15 @@ char* decodeText(const char* encodedText, Node* root) {
             current = root; // Go back to root for next character 
         }
     }
-    decodedText[decodedIndex] = '\0'; // Add null terminator 
+    decodedText[decodedIndex] = '\n'; // Add null terminator 
+    decodedText[decodedIndex+1] = '\0'; // Add null terminator 
 
     return decodedText;
 }
 
 // Huffman encodes text and writes the result into a file with provided file name
 // Accepts: filename, text to convert
-void writeEncoded(const char* filename, const char* text) {
+int writeEncoded(const char* filename, const char* text) {
     
     Node* tree = NULL;
     char encodedText[1024]; // Maybe change this to be more dynamically allocated later
@@ -163,7 +161,7 @@ void writeEncoded(const char* filename, const char* text) {
     FILE* file = fopen(filename, "wb");
     if (!file) {
         perror("Failed to open file");
-        return;
+        return -1;
     }
 
     // Write serialized tree
@@ -177,6 +175,7 @@ void writeEncoded(const char* filename, const char* text) {
 
     // Clean up
     freeTree(tree);
+    return EXIT_SUCCESS;
 }
 
 // Reads huffman encoded text located at filename, decodes the text, and returns string result
@@ -221,8 +220,8 @@ int readEncoded(const char* filename, char** output) {
     // We have tree, now decode the rest 
     char* decodedText = decodeText(fileContents + index, root); 
 
-    // Need 3 more bytes for ":" and " " and "\0"
-    int outputLength = strlen(filename) + strlen(decodedText) + 3; 
+    // Need 4 more bytes for ":" and " " and "\n" and "\0"
+    int outputLength = strlen(filename) + strlen(decodedText) + 4; 
     *output = (char*)malloc(outputLength);
     if (!output) {
         perror("Error allocating memory for output");  // so much debugging.........

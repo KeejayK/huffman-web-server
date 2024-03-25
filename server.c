@@ -165,17 +165,14 @@ void upload(int client_socket, const char* filename, char* buffer) {
 
     // Pointer to the start of the body
     char *body = strstr(buffer, "\r\n\r\n");
-    body += 4;  // Move past the weird "\r\n\r\n"
     if (body) {
-        int file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (file_fd < 0) {
+        body += 4;  // Move past the weird "\r\n\r\n"
+        int result = writeEncoded(filename, body);
+        if (result < 0) {
             // Something happened with opening
             const char *message = "HTTP/1.1 500 INTERNAL SERVER ERROR\r\nContent-length: 0\r\n\r\n";
             send(client_socket, message, strlen(message), 0);
         } else {
-            write(file_fd, body, strlen(body));
-            close(file_fd);
-
             // 200 OK Success!!!!!
             const char *message = "HTTP/1.1 200 OK\r\nContent-length: 0\r\n\r\n";
             send(client_socket, message, strlen(message), 0);
